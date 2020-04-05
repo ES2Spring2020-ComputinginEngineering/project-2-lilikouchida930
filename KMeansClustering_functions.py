@@ -20,8 +20,14 @@ def normalizeData(glucose, hemoglobin, classification):
     classNorm = (classification-np.amin(classification))/(np.amax(classification)-np.amin(classification))
     return glucoseNorm, hemoglobinNorm, classNorm
 
+def initializeClusters(k):
+    for i in k:
+        
+    
+
 #...........
 
 #MAIN SCRIPT
 glucose, hemoglobin, classification = openckdfile()
 glucoseNorm, hemoglobinNorm, classNorm = normalizeData(glucose, hemoglobin, classification)   
+k = 2
