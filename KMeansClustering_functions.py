@@ -21,7 +21,24 @@ def normalizeData(glucose, hemoglobin, classification):
     return glucoseNorm, hemoglobinNorm, classNorm
 
 def initializeClusters(k):
-    for i in k:
+#This function will randomly select k coordinate pairs (x=hemoglobinNorm, y=glucoseNorm)
+#to act as the initial clusters. These randomly selected x and y values will be added
+#to to arrays called initialClusterArray_x and initialClusterArray_y. 
+    initialClusterArray_x = np.zeros(k+1)
+    initialClusterArray_y = np.zeros(k+1)
+    for i in range(0, k):
+        index = random.randint(0, 158)
+        x0 = hemoglobinNorm[index]
+        y0 = glucoseNorm[index]
+        initialClusterArray_x[i] = x0
+        initialClusterArray_y[i] = y0
+    return initialClusterArray_x, initialClusterArray_y
+
+def findNearestCluster():
+    zArray = np.zeros(158)
+    for i in range (len(initialClusterArray_x)-1):
+        x = initialClusterArray[i]
+        y = initialClusterArray[i]
         
     
 
@@ -30,4 +47,4 @@ def initializeClusters(k):
 #MAIN SCRIPT
 glucose, hemoglobin, classification = openckdfile()
 glucoseNorm, hemoglobinNorm, classNorm = normalizeData(glucose, hemoglobin, classification)   
-k = 2
+initialClusterArray_x, initialClusterArray_y = initializeClusters(2)
