@@ -24,8 +24,8 @@ def initializeClusters(k):
 #This function will randomly select k coordinate pairs (x=hemoglobinNorm, y=glucoseNorm)
 #to act as the initial clusters. These randomly selected x and y values will be added
 #to to arrays called initialClusterArray_x and initialClusterArray_y. 
-    initialClusterArray_x = np.zeros(k+1)
-    initialClusterArray_y = np.zeros(k+1)
+    initialClusterArray_x = np.zeros(k)
+    initialClusterArray_y = np.zeros(k)
     for i in range(0, k):
         index = random.randint(0, 158)
         x0 = hemoglobinNorm[index]
@@ -34,12 +34,29 @@ def initializeClusters(k):
         initialClusterArray_y[i] = y0
     return initialClusterArray_x, initialClusterArray_y
 
-def findNearestCluster():
-    zArray = np.zeros(158)
-    for i in range (len(initialClusterArray_x)-1):
-        x = initialClusterArray[i]
-        y = initialClusterArray[i]
-        
+def findDistance(hemoglobinNorm, initialArray_x, initialClusterArray_y):
+    distances = np.zeros((len(hemoglobinNorm), len(initialClusterArray_x)))
+    for i in range(len(hemoglobinNorm)):
+        for j in range(len(initialClusterArray_x)):
+            x0 = hemoglobinNorm[i]
+            y0 = glucoseNorm[i]
+            x = initialClusterArray_x[j]
+            y = initialClusterArray_y[j]
+            z = np.sqrt(((x-x0)**2)+((y-y0)**2))
+            distances[i][j] = z
+    return distances
+
+def findNearestCentroid():
+    nearestCentroid = np.zeros((len(hemoglobinNorm), 1))
+    for i in distances:
+        for j in distances:
+            indexofKClusterThatDataPointIsClosestTo = np.argmin(distances[i])
+            nearestCentroid[i] = indexofKClusterThatDataPointsIsClosestTo
+    return nearestCentroid
+            
+                       
+               
+
     
 
 #...........
@@ -47,4 +64,6 @@ def findNearestCluster():
 #MAIN SCRIPT
 glucose, hemoglobin, classification = openckdfile()
 glucoseNorm, hemoglobinNorm, classNorm = normalizeData(glucose, hemoglobin, classification)   
-initialClusterArray_x, initialClusterArray_y = initializeClusters(2)
+initialClusterArray_x, initialClusterArray_y = initializeClusters(3)
+distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
+nearestCentroid = findNearestCentroid()
