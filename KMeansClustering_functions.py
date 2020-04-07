@@ -48,11 +48,12 @@ def findDistance(hemoglobinNorm, initialArray_x, initialClusterArray_y):
 
 def findNearestCentroid():
     nearestCentroid = np.zeros((len(hemoglobinNorm), 1))
-    for i in distances:
-        for j in distances:
-            indexofKClusterThatDataPointIsClosestTo = np.argmin(distances[i])
-            nearestCentroid[i] = indexofKClusterThatDataPointsIsClosestTo
-    return nearestCentroid
+    for row in distances:
+        minDistance = np.argmin(row)
+        nearestCentroid[] = minDistance
+    return minDistance
+        
+
             
                        
                
