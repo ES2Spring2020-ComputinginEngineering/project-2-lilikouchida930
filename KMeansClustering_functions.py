@@ -20,6 +20,8 @@ def normalizeData(glucose, hemoglobin, classification):
     classNorm = (classification-np.amin(classification))/(np.amax(classification)-np.amin(classification))
     return glucoseNorm, hemoglobinNorm, classNorm
 
+#...........
+
 def initializeClusters(k):
 #This function will randomly select k coordinate pairs (x=hemoglobinNorm, y=glucoseNorm)
 #to act as the initial clusters. These randomly selected x and y values will be added
@@ -34,6 +36,8 @@ def initializeClusters(k):
         initialClusterArray_y[i] = y0
     return initialClusterArray_x, initialClusterArray_y
 
+#...........
+
 def findDistance(hemoglobinNorm, initialArray_x, initialClusterArray_y):
     distances = np.zeros((len(hemoglobinNorm), len(initialClusterArray_x)))
     for i in range(len(hemoglobinNorm)):
@@ -46,12 +50,20 @@ def findDistance(hemoglobinNorm, initialArray_x, initialClusterArray_y):
             distances[i][j] = z
     return distances
 
+#...........
+
 def findNearestCentroid():
+#This function goes through each row in the distance array and finds the column in
+#which the minimum value in that row occurs. This index is added to a new array
+#called nearestCentroid. 
     nearestCentroid = np.zeros((len(hemoglobinNorm), 1))
-    for row in distances:
-        minDistance = np.argmin(row)
-        nearestCentroid[] = minDistance
-    return minDistance
+    m = 0
+    while m < len(distances):
+        for row in distances:
+            minDistance = np.argmin(row)
+            nearestCentroid[m] = minDistance
+            m = m+1 
+        return nearestCentroid
         
 
             
