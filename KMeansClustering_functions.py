@@ -64,7 +64,7 @@ def findNearestCentroid():
             nearestCentroid[m] = minDistance
             m = m+1 
         return nearestCentroid
-
+ 
 #...........
 
 def updateCentroids(k):
@@ -75,41 +75,38 @@ def updateCentroids(k):
         meanHemoglobin = np.mean(hemoglobinNorm[nearestCentroid==i])
         updatedArray_x[i] = meanHemoglobin
         updatedArray_y[i] = meanGlucose
-#    print(initialClusterArray_x, initialClusterArray_y)
-    return updatedArray_x, updatedArray_y
+        return updatedArray_x, updatedArray_y
+
         
 #...........
-    
-def untilNoChange(k, initialClusterArray_x, initialClusterArray_y):
-    while True:
-        # need to have 4 total arrays
-        distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
-        nearestCentroid = findNearestCentroid()
-#        print(initialClusterArray_x, initialClusterArray_y)
-        updatedArray_x, updatedArray_y = updateCentroids(k)
-#        print(updatedArray_x, updatedArray_y)
-        # have 2 old and 2 new
-        if np.array_equal(initialClusterArray_x,updatedArray_x) and np.array_equal(initialClusterArray_y,updatedArray_y):
-            return updatedArray_x, updatedArray_y
-        initialClusterArray_x = updatedArray_x
-        initialClusterArray_y = updatedArray_y
-#    estimatedClass(k)
-#    estimatedClasses = estimatedClass(k)
-#     
-#    
-#...........
 
+def untilNoChange(k, updatedArray_x, updatedArray_y,initialClusterArray_x, initialClusterArray_y):
+    updatedArray_x, updatedArray_y = updateCentroids(k)
+    i = 0
+    while i < 100:
+        if np.array_equal(initialClusterArray_x,updatedArray_x) and np.array_equal(initialClusterArray_y,updatedArray_y):
+            nearestCentroid = findNearestCentroid()
+            print("done")
+            return updatedArray_x, updatedArray_y, nearestCentroid
+        else:
+            print("still working")
+            initialClusterArray_x = updatedArray_x
+            initialClusterArray_y = updatedArray_y
+            updatedArray_x, updatedArray_y = updateCentroids(k)
+            i = i + 1
+        
+#...........
             
-def estimatedClass(k):  
+def estimatedClass(k): 
+#In correspondence to the last part of the project, estimateClass(k) assigns each 
+#pre-existing data point to the classification which its nearest centroid has. 
     estimatedClasses = np.zeros(len(hemoglobinNorm))
     for i in range(len(hemoglobinNorm)): 
         for j in range(k):
             nearestCentroid = findNearestCentroid()
-            estimatedClasses[i] = classNorm[k]
+            estimatedClasses[i] = classNorm[j]
     return estimatedClasses
-               
-#
-#     
+   
  
 #...........
  
@@ -121,4 +118,5 @@ distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterAr
 nearestCentroid = findNearestCentroid()
 updatedArray_x, updatedArray_y = updateCentroids(2)
         
-untilNoChange(2, initialClusterArray_x, initialClusterArray_y)
+updatedArray_x, updatedArray_y, nearestCentroid = untilNoChange(2, updatedArray_x, updatedArray_y, initialClusterArray_x, initialClusterArray_y)
+estimatedClasses = estimatedClass(2)
