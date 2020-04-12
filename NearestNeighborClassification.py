@@ -92,7 +92,7 @@ def kNearestNeighborClassifier(k, newGluNorm, newHemoNorm,glucoseNorm, hemoglobi
     classSum = 0
     for i in k_classifications:
         classSum = classSum + i
-        classMajority = classSum/k
+        classMajority = round(classSum/k)
     return k_classifications, classMajority
         
     
@@ -111,7 +111,7 @@ newGluNorm, newHemoNorm = createTestCase()
 zArray = calculateDistanceArray(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm)
 nearest_class = nearestNeighborClassifier(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm, classNorm)
 graphTestCase(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm, classNorm)
-k_classifications, classMajority = kNearestNeighborClassifier(3, newGluNorm, newHemoNorm,glucoseNorm, hemoglobinNorm, classNorm)
+k_classifications, classMajority = kNearestNeighborClassifier(5, newGluNorm, newHemoNorm,glucoseNorm, hemoglobinNorm, classNorm)
  
 
 plt.figure()
