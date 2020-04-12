@@ -112,7 +112,7 @@ zArray = calculateDistanceArray(newGluNorm, newHemoNorm, glucoseNorm, hemoglobin
 nearest_class = nearestNeighborClassifier(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm, classNorm)
 graphTestCase(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm, classNorm)
 k_classifications, classMajority = kNearestNeighborClassifier(3, newGluNorm, newHemoNorm,glucoseNorm, hemoglobinNorm, classNorm)
-print();        
+ 
 
 plt.figure()
 plt.plot(hemoglobin[classification==1],glucose[classification==1], "k.", label = "Class 1")
