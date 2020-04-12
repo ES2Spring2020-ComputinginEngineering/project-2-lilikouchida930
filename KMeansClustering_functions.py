@@ -57,7 +57,7 @@ distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterAr
 
 #...........
 
-def findNearestCentroid():
+def findNearestCentroid(distances):
 #This function goes through each row in the distance array and finds the column in distances
 #which the minimum value in that row occurs. This index is added to a new array
 #called nearestCentroid. 
@@ -70,11 +70,11 @@ def findNearestCentroid():
             m = m+1 
         return nearestCentroid
 
-nearestCentroid = findNearestCentroid()
+nearestCentroid = findNearestCentroid(distances)
  
 #...........
 
-def updateCentroids(k):
+def updateCentroids(k, nearestCentroid):
     for i in range(k):
         meanGlucose = np.mean(glucoseNorm[nearestCentroid==i])       
         meanHemoglobin = np.mean(hemoglobinNorm[nearestCentroid==i])
@@ -84,15 +84,17 @@ def updateCentroids(k):
 
 updatedArray_x = np.zeros(2)
 updatedArray_y = np.zeros(2)
-updatedArray_x, updatedArray_y = updateCentroids(2)
+updatedArray_x, updatedArray_y = updateCentroids(2, nearestCentroid)
 
          
 #...........
 
 def untilNoChange(k, updatedArray_x, updatedArray_y,initialClusterArray_x, initialClusterArray_y):
-    updatedArray_x, updatedArray_y = updateCentroids(k)
+    distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
+    nearestCentroid = findNearestCentroid(distances)
+    updatedArray_x, updatedArray_y = updateCentroids(k, nearestCentroid)
     i = 0
-    while i < 100:
+    while i < 10000:
         if np.array_equal(initialClusterArray_x,updatedArray_x) and np.array_equal(initialClusterArray_y,updatedArray_y):
             print("done")
             return updatedArray_x, updatedArray_y
@@ -101,8 +103,8 @@ def untilNoChange(k, updatedArray_x, updatedArray_y,initialClusterArray_x, initi
             initialClusterArray_x = updatedArray_x
             initialClusterArray_y = updatedArray_y
             distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
-            nearestCentroid = findNearestCentroid()
-            updatedArray_x, updatedArray_y = updateCentroids(k)
+            nearestCentroid = findNearestCentroid(distances)
+            updatedArray_x, updatedArray_y = updateCentroids(k, nearestCentroid)
             i = i + 1
 
 updatedArray_x, updatedArray_y = untilNoChange(2, updatedArray_x, updatedArray_y,initialClusterArray_x, initialClusterArray_y)
