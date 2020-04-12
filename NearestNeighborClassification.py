@@ -111,7 +111,7 @@ newGluNorm, newHemoNorm = createTestCase()
 zArray = calculateDistanceArray(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm)
 nearest_class = nearestNeighborClassifier(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm, classNorm)
 graphTestCase(newGluNorm, newHemoNorm, glucoseNorm, hemoglobinNorm, classNorm)
-k_classifications, classMajority = kNearestNeighborClassifier(10, newGluNorm, newHemoNorm,glucoseNorm, hemoglobinNorm, classNorm)
+k_classifications, classMajority = kNearestNeighborClassifier(3, newGluNorm, newHemoNorm,glucoseNorm, hemoglobinNorm, classNorm)
 print();        
 
 plt.figure()
