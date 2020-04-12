@@ -37,7 +37,7 @@ nearest_class displays result of nearest neighbor.
 
 
 ****************************************************************************************
-kMeansCluster_functions.py
+kMeansClustering_functions.py
 ****************************************************************************************
 
 - include functions for k-means clustering classification method
@@ -48,12 +48,29 @@ FUNCTIONS:
 
 2) normalizeData --> see previous
 
-3) initializeClusters --> initializes k amount of starting clusters. Takes desired integer k.
+3) initializeClusters --> initializes k amount of starting clusters. Takes desired integer k.returns k starting clusters in the form of array pairs. 
 
-4) findDistance --> finds distance between each sample data point and each initial cluster. Takes normalized hemoglobin array, and initial cluster arrays.
+4) findDistance --> finds distance between each sample data point and each initial cluster. Takes normalized hemoglobin array, and initial cluster arrays. Returns distance arrays with distances from each sample data point to each k-th cluster. 
 
-5) findNearestCentroid --> assigns each sample data point to the nth cluster to which it is nearest to. 
+5) findNearestCentroid --> assigns each sample data point to the nth cluster to which it is nearest to. Takes distances array. returns array with number of k-th cluster to which each sample data point is closest to. 
 
-6) updateCentroids -->  Updates centroid values with mean values of previous data points associated with each k-th cluster. takes desired k integer value.
+6) updateCentroids -->  Updates centroid values with mean values of previous data points associated with each k-th cluster. takes desired k integer value and nearestCentroid array. Returns two updated arrays, one corresponding to hemoglobin and one corresponding to glucose average values.
 
-7) untilNoChange --> repeats the update and reinitialize cluster process until an end condition is met. Takes desired integer k, updated arrays, and initial cluster arrays. 
+7) untilNoChange --> repeats the update and reinitialize cluster process until an end condition is met. Takes desired integer k, updated arrays, and initial cluster arrays. Returns updated arrays once end condition is met. 
+
+8) findDistanceFinal --> once end condition is met, calculates the distance between each sample data point and each finalized cluster. Returns a nearestCentroidFinal array.
+
+9) calculatePercentage --> counts the number of correctly labeled CKD and nonCKD patients and returns these values as variables. 
+
+10) graphingKMeans --> graphs clusters and sample data sets. Takes in normalized glucose and hemoglobin arrays, normalized classifications, and updated arrays. 
+
+
+****************************************************************************************
+kMeansClustering_driver.py
+****************************************************************************************
+
+- includes mainscript for k-means clustering classification method
+
+TO RUN:
+
+Change red integer values in lns 9, 12, 13, 14, 15 to desired values of k. Input k = 2 for part about correctly/incorrectly labeled CKD/nonCKD patients. 
