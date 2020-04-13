@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Apr 12 18:27:59 2020
+
+@author: lilikouchida
+"""
+
 #Please place your FUNCTION code for step 4 here.
 
 import numpy as np
@@ -11,173 +19,164 @@ def openckdfile():
     glucose, hemoglobin, classification = np.loadtxt('ckd.csv', delimiter=',', skiprows=1, unpack=True)
     return glucose, hemoglobin, classification
 
-glucose, hemoglobin, classification = openckdfile()
-#...........
+#........... 
     
 def normalizeData(glucose, hemoglobin, classification):
 #Normalizes each of the three data sets to a unitless scale of 0 to 1. 
-    glucoseNorm = (glucose-np.amin(glucose))/(np.amax(glucose)-np.amin(glucose))
-    hemoglobinNorm = (hemoglobin-np.amin(hemoglobin))/(np.amax(hemoglobin)-np.amin(hemoglobin))
-    classNorm = (classification-np.amin(classification))/(np.amax(classification)-np.amin(classification))
-    return glucoseNorm, hemoglobinNorm, classNorm
+    glucose_normalized = (glucose-np.amin(glucose))/(np.amax(glucose)-np.amin(glucose))
+    hemoglobin_normalized = (hemoglobin-np.amin(hemoglobin))/(np.amax(hemoglobin)-np.amin(hemoglobin))
+    class_normalized = (classification-np.amin(classification))/(np.amax(classification)-np.amin(classification))
+    return glucose_normalized, hemoglobin_normalized, class_normalized
 
-glucoseNorm, hemoglobinNorm, classNorm = normalizeData(glucose, hemoglobin, classification)
 #...........
-
+ 
 def initializeClusters(k):
 #This function will randomly select k coordinate pairs (x=hemoglobinNorm, y=glucoseNorm)
 #to act as the initial clusters. These randomly selected x and y values will be added
 #to to arrays called initialClusterArray_x and initialClusterArray_y. 
-    initialClusterArray_x = np.zeros(k)
-    initialClusterArray_y = np.zeros(k)
-    for i in range(0, k):
+    initial_clusters_arr = np.zeros((2,k))
+#    for i in range(2):
+    for j in range(k):
         index = random.randint(0, 157)
-        x0 = hemoglobinNorm[index]
-        y0 = glucoseNorm[index]
-        initialClusterArray_x[i] = x0
-        initialClusterArray_y[i] = y0
-    return initialClusterArray_x, initialClusterArray_y
+        initial_clusters_arr[0,j] = hemoglobin_normalized[index] #top row is hemoglobin
+        initial_clusters_arr[1,j] = glucose_normalized[index] #bottom row is glucose
+    return initial_clusters_arr
 
-initialClusterArray_x, initialClusterArray_y = initializeClusters(2)
 #...........
-
-def findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y):
-    distances = np.zeros((len(hemoglobinNorm), len(initialClusterArray_x)))
-    for i in range(len(hemoglobinNorm)):
-        for j in range(len(initialClusterArray_x)):
-            x0 = hemoglobinNorm[i]
-            y0 = glucoseNorm[i]
-            x = initialClusterArray_x[j]
-            y = initialClusterArray_y[j]
-            z = np.sqrt(((x-x0)**2)+((y-y0)**2))
-            distances[i][j] = z
-    return distances
-
-distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
+ 
+def findDistance(k, hemoglobin_normalized, glucose_normalized, initial_clusters_arr):
+    distances_arr = np.zeros((len(hemoglobin_normalized), k))
+    for j in range(k):
+        for i in range(len(hemoglobin_normalized)):
+           x0 = hemoglobin_normalized[i] 
+           y0 = glucose_normalized[i]
+           x = initial_clusters_arr[0,j] 
+           y = initial_clusters_arr[1,j]
+           z = np.sqrt(((x-x0)**2)+((y-y0)**2))
+           distances_arr[i][j] = z
+    return distances_arr #array with 158 rows (one for each sample data point) and 
+#k columns.
 
 #...........
 
-def findNearestCentroid(distances):
+def findNearestCentroid(distances_arr):
 #This function goes through each row in the distance array and finds the column in distances
 #which the minimum value in that row occurs. This index is added to a new array
 #called nearestCentroid. 
-    nearestCentroid = np.zeros((len(hemoglobinNorm)))
-    m = 0
-    while m < len(distances):
-        for row in distances:
-            minDistance = np.argmin(row)
-            nearestCentroid[m] = minDistance
-            m = m+1 
-        return nearestCentroid
+    nearest_centroid = np.zeros((len(hemoglobin_normalized)))
+#    m = 0
+#    while m < len(distances_arr):
+    for i in range(np.shape(distances_arr)[0]):
+        minDistance = np.argmin(distances_arr[i,:])
+        nearest_centroid[i] = minDistance
+#            m = m+1 
+    return nearest_centroid
 
-nearestCentroid = findNearestCentroid(distances)
  
 #...........
 
-def updateCentroids(k, nearestCentroid):
+def updateCentroids(k, nearest_centroid):
+    updated_arr = np.zeros((2,k))
     for i in range(k):
-        meanGlucose = np.mean(glucoseNorm[nearestCentroid==i])       
-        meanHemoglobin = np.mean(hemoglobinNorm[nearestCentroid==i])
-        updatedArray_x[i] = meanHemoglobin
-        updatedArray_y[i] = meanGlucose
-    return updatedArray_x, updatedArray_y
+        avg_glucose = np.mean(glucose_normalized[nearest_centroid==i])       
+        avg_hemoglobin = np.mean(hemoglobin_normalized[nearest_centroid==i])
+        updated_arr[0,i] = avg_hemoglobin
+        updated_arr[1,i] = avg_glucose
+        print ("updating centroids")
+    return updated_arr
 
-updatedArray_x = np.zeros(2)
-updatedArray_y = np.zeros(2)
-updatedArray_x, updatedArray_y = updateCentroids(2, nearestCentroid)
 
          
 #...........
 
-def untilNoChange(k, updatedArray_x, updatedArray_y,initialClusterArray_x, initialClusterArray_y):
-    distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
-    nearestCentroid = findNearestCentroid(distances)
-    updatedArray_x, updatedArray_y = updateCentroids(k, nearestCentroid)
-    i = 0
-    while i < 10000:
-        if np.array_equal(initialClusterArray_x,updatedArray_x) and np.array_equal(initialClusterArray_y,updatedArray_y):
-            print("done")
-            return updatedArray_x, updatedArray_y
+def untilNoChange(k, updated_arr, initial_clusters_arr):
+    while True: 
+        print ("in progress")
+        if abs(np.min(initial_clusters_arr - updated_arr)) < 0.00001:
+           print("done")
+           return updated_arr, initial_clusters_arr
         else:
             print("still working")
-            initialClusterArray_x = updatedArray_x
-            initialClusterArray_y = updatedArray_y
-            distances = findDistance(hemoglobinNorm, initialClusterArray_x, initialClusterArray_y)
-            nearestCentroid = findNearestCentroid(distances)
-            updatedArray_x, updatedArray_y = updateCentroids(k, nearestCentroid)
-            i = i + 1
+            initial_clusters_arr = updated_arr
+            distances_arr = findDistance(k, hemoglobin_normalized, glucose_normalized, initial_clusters_arr)
+            nearest_centroid = findNearestCentroid(distances_arr)
+            updated_arr = updateCentroids(k, nearest_centroid)
 
-updatedArray_x, updatedArray_y = untilNoChange(2, updatedArray_x, updatedArray_y,initialClusterArray_x, initialClusterArray_y)
+
 #...........
             
-def findDistanceFinal(hemoglobinNorm, updatedArray_x, updatedArray_y):
-    distancesFinal = np.zeros((len(hemoglobinNorm), len(updatedArray_x)))
-    for i in range(len(hemoglobinNorm)):
-        for j in range(len(updatedArray_x)):
-            x0 = hemoglobinNorm[i]
-            y0 = glucoseNorm[i]
-            x = updatedArray_x[j]
-            y = updatedArray_y[j] 
-            z = np.sqrt(((x-x0)**2)+((y-y0)**2))
-            distancesFinal[i][j] = z
-    return distancesFinal
+def findDistanceFinal(k, hemoglobin_normalized, updated_arr):
+    final_distances_arr = np.zeros((len(hemoglobin_normalized), k))
+    for i in range(len(hemoglobin_normalized)):
+        for j in range(k):
+            x0 = hemoglobin_normalized[i]
+            y0 = glucose_normalized[i] 
+            x = updated_arr[0,j] 
+            y = updated_arr[1,j]
+            Z = np.sqrt(((x-x0)**2)+((y-y0)**2))
+            final_distances_arr[i][j] = Z
+    return final_distances_arr 
 
-distancesFinal = findDistanceFinal(hemoglobinNorm, updatedArray_x, updatedArray_y)
 
 
 #...........
 
-def findNearestCentroidFinal():
-    nearestCentroidFinal = np.zeros((len(hemoglobinNorm)))
+def findNearestCentroidFinal(k, final_distances_arr):
+    final_nearest_centroid = np.zeros((len(hemoglobin_normalized)))
     m = 0
-    distancesFinal = findDistanceFinal(hemoglobinNorm, updatedArray_x, updatedArray_y)
-    while m < len(distancesFinal):
-        for row in distancesFinal:
+    while m < len(final_distances_arr):
+        for row in final_distances_arr:
             minDistanceFinal = np.argmin(row)
-            nearestCentroidFinal[m] = minDistanceFinal
+            final_nearest_centroid[m] = minDistanceFinal
             m = m+1 
-        return nearestCentroidFinal
+        return final_nearest_centroid 
 
-nearestCentroidFinal = findNearestCentroidFinal()
 
 
  #...........
  
+ 
 
-
-def calculatePercentages():
-    nearestCentroidFinal = findNearestCentroidFinal()
-    glucoseNorm, hemoglobinNorm, classNorm = normalizeData(glucose, hemoglobin, classification)
+def numberCorrect(nearest_centroid, class_normalized):
     corr_lab_CKD = 0
     corr_lab_nonCKD = 0
-    for i in range(len(nearestCentroidFinal)):
-        if nearestCentroidFinal[i]==1 and classNorm[i]==1:
+    for i in range(len(nearest_centroid)):
+        if nearest_centroid[i]==1 and class_normalized[i]==1:
             corr_lab_CKD = corr_lab_CKD+1
-        elif nearestCentroidFinal[i]==0 and classNorm[i]==0:
+        elif nearest_centroid[i]==0 and class_normalized[i]==0:
             corr_lab_nonCKD = corr_lab_nonCKD+1
     return corr_lab_CKD, corr_lab_nonCKD
   
 
-corr_lab_CKD, corr_lab_nonCKD = calculatePercentages()
 
- #...........
+ #........... 
 
 
-def graphingKMeans(glucoseNorm, hemoglobinNorm, classNorm, updatedArray_x, updatedArray_y):
+def graphingKMeans(glucose_normalized, hemoglobin_normalized, class_normalized, updated_arr):
     plt.figure()
-    for i in range(int(nearestCentroidFinal.max()+1)):
+    for i in range(int(nearest_centroid.max()+1)):
         rcolor = np.random.rand(3,)
-        plt.plot(hemoglobinNorm[classNorm==i],glucoseNorm[classNorm==i], ".", label = "Class " + str(i), color = rcolor)
-        plt.plot(updatedArray_x[i], updatedArray_y[i], "D", label = "Centroid " + str(i), color = rcolor)
+        plt.plot(hemoglobin_normalized[nearest_centroid==i],glucose_normalized[nearest_centroid==i], ".", label = "Class " + str(i), color = rcolor)
+        plt.plot(updated_arr[0,i], updated_arr[1,i], "D", label = "Centroid " + str(i), color = rcolor)
     plt.xlabel("Hemoglobin")
     plt.ylabel("Glucose")
     plt.legend()
     plt.show()
 
-graphingKMeans(glucoseNorm, hemoglobinNorm, classNorm, updatedArray_x, updatedArray_y)
 
             
 #   
- 
-#...........
+  
+#..........
+glucose, hemoglobin, classification = openckdfile()
+glucose_normalized, hemoglobin_normalized, class_normalized = normalizeData(glucose, hemoglobin, classification)
+initial_clusters_arr = initializeClusters(2)
+distances_arr = findDistance(2, hemoglobin_normalized, glucose_normalized, initial_clusters_arr)
+nearest_centroid = findNearestCentroid(distances_arr)
+updated_arr = updateCentroids(2, nearest_centroid)
+updated_arr, initial_clusters_arr = untilNoChange(2, updated_arr, initial_clusters_arr)
+#final_distances_arr = findDistanceFinal(2, hemoglobin_normalized, updated_arr)
+#final_nearest_centroid = findNearestCentroidFinal(2, final_distances_arr)
+corr_lab_CKD, corr_lab_nonCKD = numberCorrect(nearest_centroid, class_normalized)
+graphingKMeans(glucose_normalized, hemoglobin_normalized, class_normalized, updated_arr)
  
